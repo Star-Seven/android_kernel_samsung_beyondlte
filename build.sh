@@ -1,5 +1,33 @@
 #!/bin/bash
 
+# Default values
+BUILD_JOB_NUMBER=$(grep -c ^processor /proc/cpuinfo)
+USE_PISS=0
+
+# Parse command line options
+while getopts ":j:N" opt; do
+  case ${opt} in
+    j )
+      BUILD_JOB_NUMBER=$OPTARG
+      ;;
+    N )
+      USE_PISS=1
+      ;;
+    \? )
+      echo "Invalid option: $OPTARG" 1>&2
+      ;;
+    : )
+      echo "Invalid option: $OPTARG requires an argument" 1>&2
+      ;;
+  esac
+done
+shift $((OPTIND -1))
+
+export MODEL=$1
+export piss=$2
+export BUILD_CROSS_COMPILE=$(pwd)/toolchains/aarch64-linux-android-4.9/bin/aarch64-linux-androidkernel-
+RDIR=$(pwd)
+
 export MODEL=$1
 export piss=$2
 export BUILD_CROSS_COMPILE=$(pwd)/toolchains/aarch64-linux-android-4.9/bin/aarch64-linux-androidkernel-
@@ -57,16 +85,15 @@ esac
 
 FUNC_BUILD_KERNEL()
 {
-    echo " Starting a kernel build using "$KERNEL_DEFCONFIG ""
-    # No this is not a typo, samsung left it this way on 12
+    echo " Starting a kernel build using $KERNEL_DEFCONFIG"
     export PLATFORM_VERSION=11
     export ANDROID_MAJOR_VERSION=r
 
-    if [ -n "$piss" ]; then
-    echo "Building with N variant tzdev"
-    rm -r drivers/misc/tzdev
-    cp -r BTStzdev drivers/misc/tzdev
-    sleep 5
+    if [ $USE_PISS -eq 1 ]; then
+        echo "Building with N variant tzdev"
+        rm -rf drivers/misc/tzdev
+        cp -r BTStzdev drivers/misc/tzdev
+        sleep 5
     fi
 
     make -j$BUILD_JOB_NUMBER ARCH=arm64 \
@@ -135,16 +162,16 @@ FUNC_BUILD_ZIP()
 # MAIN FUNCTION
 rm -rf ./build.log
 (
-	START_TIME=`date +%s`
+    START_TIME=$(date +%s)
 
-	FUNC_BUILD_KERNEL
-	FUNC_BUILD_DTBO
-	FUNC_BUILD_RAMDISK
-	FUNC_BUILD_ZIP
+    FUNC_BUILD_KERNEL
+    FUNC_BUILD_DTBO
+    FUNC_BUILD_RAMDISK
+    FUNC_BUILD_ZIP
 
-	END_TIME=`date +%s`
+    END_TIME=$(date +%s)
 
-	let "ELAPSED_TIME=$END_TIME-$START_TIME"
-	echo "Total compile time was $ELAPSED_TIME seconds"
+    let "ELAPSED_TIME=$END_TIME-$START_TIME"
+    echo "Total compile time was $ELAPSED_TIME seconds"
 
-) 2>&1	| tee -a ./build.log
+) 2>&1 | tee -a ./build.log
