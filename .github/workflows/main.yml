@@ -1,10 +1,7 @@
 name: build
 
 on:
-  push:
-    branches: [ "Star-Seven-patch-1" ]
-  pull_request:
-    branches: [ "Star-Seven-patch-1" ]
+  workflow_dispatch:
     
 jobs:
   build:
