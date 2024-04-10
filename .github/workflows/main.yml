@@ -1,5 +1,11 @@
-name: build and release
-  
+name: build
+
+on:
+  push:
+    branches: [ "Star-Seven-patch-1" ]
+  pull_request:
+    branches: [ "Star-Seven-patch-1" ]
+    
 jobs:
   build:
     runs-on: ubuntu-latest
