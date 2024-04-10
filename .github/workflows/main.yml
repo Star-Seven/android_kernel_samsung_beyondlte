@@ -1,7 +1,4 @@
 name: build and release
-
-on:
-  workflow_dispatch:
   
 jobs:
   build:
