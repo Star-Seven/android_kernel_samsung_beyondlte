@@ -10,7 +10,10 @@ jobs:
     steps:
       - name: Check Out
         uses: actions/checkout@v3
-
+        
+      - name: Check Out
+        run: chmod +x build.sh
+        
       - name: Build
         run: ./build.sh d2x N
         
