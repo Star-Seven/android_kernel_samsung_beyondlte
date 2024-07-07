@@ -1,0 +1,25 @@
+name: build and release
+
+on:
+  workflow_dispatch:
+    inputs:      
+      tag:
+        description: 'Release'
+        required: true        
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Out
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: ./build.sh beyondx
+        
+      - name: Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: ${{ github.workspace }}/build/
