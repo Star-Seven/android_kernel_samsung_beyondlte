@@ -14,6 +14,9 @@ jobs:
     steps:
       - name: Check Out
         uses: actions/checkout@v4
+        
+      - name: Permission settings
+        run: chmod +x build.sh
 
       - name: Build
         run: ./build.sh beyondx
