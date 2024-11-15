@@ -25,7 +25,7 @@ jobs:
         curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
 
     - name: Build
-      run: ./build.sh --model "${{ github.event.inputs.model }}"
+      run: ./build.sh "${{ github.event.inputs.model }}"
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
