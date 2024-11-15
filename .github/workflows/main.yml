@@ -1,35 +1,36 @@
-name: build and release
+name: Build and Release
 
 on:
   workflow_dispatch:
-    inputs:      
-      tag:
-        description: 'Release'
-        required: true        
+    inputs:
+      model:
+        description: 'Model code of the phone'
+        required: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Out
-        uses: actions/checkout@v4
-  
-      - name: Setup KernelSU
-        run: |
-          if [ -d "./KernelSU" ]; then
-            rm -rf "./KernelSU"
-          fi
-          if [ -d "./drivers/kernelsu" ]; then
-            rm -rf "./drivers/kernelsu"
-          fi
-          curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
+    - name: Check Out
+      uses: actions/checkout@v4
 
-      - name: Build
-        run: ./build.sh d2x N
-        
-      - name: Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: ${{ github.workspace }}/build/
+    - name: Setup KernelSU
+      run: |
+        # Remove existing KernelSU directories if they exist
+        if [ -d "./KernelSU" ]; then rm -rf "./KernelSU"; fi
+        if [ -d "./drivers/kernelsu" ]; then rm -rf "./drivers/kernelsu"; fi
+
+        # Download and execute KernelSU setup script
+        curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s v0.9.5
+
+    - name: Build
+      run: ./build.sh --model "${{ github.event.inputs.model }}"
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build
+        path: ${{ github.workspace }}/build/
+
+    # Optionally, you can add more steps here for testing, packaging, releasing, etc.
